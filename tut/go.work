@@ -1,0 +1,8 @@
+go 1.21.1
+
+use (
+	./23mymodules
+	./24api
+	./25mongoapi
+	./27mutexandawaitgroups
+)
