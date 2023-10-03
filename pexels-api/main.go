@@ -139,7 +139,7 @@ func (c *Client) getRandomPhoto() (*photo, error) {
 }
 
 func main() {
-	os.Setenv("PexelsToken", "FsxL6zoD33ItoFyLo7C7H3mli7QyRJy1xLN0x0zLC0zRzgGCttCIzLSf")
+	os.Setenv("PexelsToken", "--ENTER YOUR PEXELS API KEY HERE--")
 	var TOKEN = os.Getenv("PexelsToken")
 
 	var c = NewClient(TOKEN)
