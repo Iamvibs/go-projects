@@ -20,7 +20,7 @@ const (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s <hh:mm> <text message\n>", os.Args[0])
+		fmt.Printf("Usage: %s <hh:mm> \"text message\"\n", os.Args[0])
 		os.Exit(1)
 	}
 
@@ -50,7 +50,7 @@ func main() {
 	diff := t.Time.Sub(now)
 	if os.Getenv(markName) == markValue {
 		time.Sleep(diff)
-		beeep.Alert("Reminder", strings.Join(os.Args[2:], ""), "assets/information.png")
+		beeep.Alert("Reminder", strings.Join(os.Args[2:], " "), "assets/information.png")
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(4)
