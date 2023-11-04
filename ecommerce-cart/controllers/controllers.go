@@ -11,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/iamvibs/golang-projects/ecommerce-cart/database"
 	"github.com/iamvibs/golang-projects/ecommerce-cart/models"
+	"github.com/iamvibs/golang-projects/ecommerce-cart/tokens"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -89,7 +90,7 @@ func Signup() gin.HandlerFunc {
 		user.ID = primitive.NewObjectID()
 		user.User_ID = user.ID.Hex()
 
-		token, refreshtoken, _ := generate.tokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
+		token, refreshtoken, _ := tokens.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
 		user.Token = &token
 		user.Refresh_Token = &refreshtoken
 		user.UserCart = make([]models.ProductUser, 0)
@@ -131,16 +132,31 @@ func Login() gin.HandlerFunc {
 			fmt.Println(msg)
 			return
 		}
-		token, refreshToken, _ := generate.tokenGenerator(*founduser.Email, *founduser.First_Name, *founduser.Last_Name, founduser.User_ID)
+		token, refreshToken, _ := tokens.TokenGenerator(*founduser.Email, *founduser.First_Name, *founduser.Last_Name, founduser.User_ID)
 
-		generate.UpdateAllTokens(token, refreshToken, founduser.User_ID)
+		tokens.UpdateAllTokens(token, refreshToken, founduser.User_ID)
 		c.JSON(http.StatusFound, founduser)
 	}
 }
 
 func ProductViewerAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 
+		var products models.Product
+		if err := c.BindJSON(&products); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		products.Product_ID = primitive.NewObjectID()
+		_, anyerr := productCollection.InsertOne(ctx, products)
+		if anyerr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "not inserted"})
+			return
+		}
+		c.JSON(http.StatusOK, "successfully aded admin")
 	}
 }
 
@@ -189,11 +205,12 @@ func SearchProductByQuery() gin.HandlerFunc {
 		defer cancel()
 
 		searchQueryDB, err := productCollection.Find(ctx, bson.M{"product_name": bson.M{"$regex": queryParam}})
-		defer searchQueryDB.Close(ctx)
 		if err != nil {
 			c.IndentedJSON(404, "something went wrong fetching the data")
 			return
 		}
+
+		defer searchQueryDB.Close(ctx)
 
 		err = searchQueryDB.All(ctx, &SearchProducts)
 		if err != nil {

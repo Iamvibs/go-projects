@@ -20,7 +20,7 @@ type Application struct {
 	userCollection *mongo.Collection
 }
 
-func newApplication(prodCollection, userCollection *mongo.Collection) *Application {
+func NewApplication(prodCollection, userCollection *mongo.Collection) *Application {
 	return &Application{
 		prodCollection: prodCollection,
 		userCollection: userCollection,
