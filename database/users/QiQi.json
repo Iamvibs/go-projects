@@ -1,0 +1,12 @@
+{
+	"Name": "QiQi",
+	"Age": 26,
+	"Contact": "qiqi@example.com",
+	"Company": "Example Four Org",
+	"Address": {
+		"City": "Banglore",
+		"State": "Karnataka",
+		"Country": "India",
+		"Pincode": 410013
+	}
+}

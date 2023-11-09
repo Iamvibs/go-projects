@@ -1,0 +1,12 @@
+{
+	"Name": "John",
+	"Age": 23,
+	"Contact": "john@example.com",
+	"Company": "Example Org",
+	"Address": {
+		"City": "Banglore",
+		"State": "Karnataka",
+		"Country": "India",
+		"Pincode": 410013
+	}
+}
